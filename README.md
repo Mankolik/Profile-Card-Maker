@@ -9,10 +9,12 @@ https://mankolik.github.io/Profile-Card-Maker/
 ## Features
 
 - Upload a profile picture
-- Add a custom name
+- Circular profile-picture crop
+- Add a custom name and short description
+- Roll a random funny description with the 🎲 button
 - Choose between multiple visual styles
 - Change the accent color and text style
-- Adjust image zoom and vertical position
+- Adjust image zoom, left/right position, and up/down position
 - Export the finished card as a 1080 × 1080 PNG
 - iPhone/iPad sharing support through the native share sheet
 
@@ -22,7 +24,7 @@ Everything runs locally in your browser. Uploaded images are not sent to a serve
 
 ## Usage
 
-Open the live app, choose an image, enter a name, customize the card, then use **Save / Share PNG** to export it.
+Open the live app, choose an image, enter a name and description (or roll one), customize the card, then use **Save / Share PNG** to export it.
 
 ## Tech
 
