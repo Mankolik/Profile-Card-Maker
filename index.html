@@ -1,715 +1,276 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Profile Card Maker</title>
-<style>
-  :root{
-    --bg:#0b0b0d;
-    --panel:#151519;
-    --panel2:#1d1d22;
-    --text:#f6f6f7;
-    --muted:#96969f;
-    --accent:#e50914;
-    --border:#2b2b31;
-  }
-
-  *{box-sizing:border-box}
-
-  body{
-    margin:0;
-    min-height:100vh;
-    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color:var(--text);
-    background:
-      radial-gradient(circle at 78% 18%, rgba(229,9,20,.13), transparent 28%),
-      radial-gradient(circle at 16% 90%, rgba(118,69,255,.09), transparent 24%),
-      var(--bg);
-  }
-
-  .app{
-    min-height:100vh;
-    display:grid;
-    grid-template-columns:360px 1fr;
-  }
-
-  .sidebar{
-    padding:30px;
-    padding-top:max(30px, env(safe-area-inset-top));
-    padding-left:max(30px, env(safe-area-inset-left));
-    padding-right:max(30px, env(safe-area-inset-right));
-    background:rgba(17,17,20,.94);
-    border-right:1px solid var(--border);
-    backdrop-filter:blur(20px);
-  }
-
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:34px;
-  }
-
-  .mark{
-    width:34px;height:34px;border-radius:9px;
-    background:var(--accent);
-    display:grid;place-items:center;
-    font-weight:900;
-    font-size:20px;
-    box-shadow:0 8px 24px rgba(229,9,20,.28);
-  }
-
-  h1{
-    margin:0;
-    font-size:20px;
-    line-height:1.05;
-    letter-spacing:-.02em;
-  }
-
-  .sub{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:3px;
-  }
-
-  label{
-    display:block;
-    color:#cacad0;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:.02em;
-    margin:19px 0 8px;
-  }
-
-  input[type="text"], textarea, select{
-    width:100%;
-    border:1px solid var(--border);
-    background:var(--panel2);
-    color:white;
-    border-radius:11px;
-    padding:12px 13px;
-    outline:none;
-    font-size:14px;
-  }
-
-  input[type="text"]:focus, textarea:focus, select:focus{
-    border-color:#575761;
-    box-shadow:0 0 0 3px rgba(255,255,255,.04);
-  }
-
-  .upload{
-    position:relative;
-    border:1px dashed #45454d;
-    border-radius:13px;
-    padding:16px;
-    text-align:center;
-    background:#19191d;
-    cursor:pointer;
-    transition:.18s ease;
-  }
-
-  .upload:hover{
-    border-color:#666670;
-    background:#1c1c21;
-  }
-
-  .upload input{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    opacity:0;
-    cursor:pointer;
-  }
-
-  .upload strong{
-    display:block;
-    font-size:13px;
-    margin-bottom:4px;
-  }
-
-  .upload span{
-    color:var(--muted);
-    font-size:11px;
-  }
-
-  textarea{
-    width:100%;
-    min-height:74px;
-    resize:vertical;
-    font-family:inherit;
-    line-height:1.35;
-  }
-
-  .bio-row{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:9px;
-    align-items:stretch;
-  }
-
-  .bio-row button{
-    padding:0 14px;
-    white-space:nowrap;
-  }
-
-  .row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-
-  .colors{
-    display:flex;
-    gap:9px;
-    flex-wrap:wrap;
-  }
-
-  .swatch{
-    width:31px;
-    height:31px;
-    border-radius:50%;
-    border:2px solid transparent;
-    cursor:pointer;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.13);
-  }
-
-  .swatch.active{
-    border-color:white;
-    box-shadow:0 0 0 3px rgba(255,255,255,.08);
-  }
-
-  .range-head{
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    color:#cacad0;
-    font-size:12px;
-    font-weight:700;
-    margin:19px 0 8px;
-  }
-
-  .range-head span:last-child{
-    color:var(--muted);
-    font-weight:500;
-  }
-
-  input[type="range"]{
-    width:100%;
-    accent-color:white;
-  }
-
-  .buttons{
-    display:grid;
-    gap:9px;
-    margin-top:28px;
-  }
-
-  button{
-    border:0;
-    border-radius:12px;
-    padding:13px 15px;
-    font-size:14px;
-    font-weight:800;
-    cursor:pointer;
-    transition:.18s ease;
-  }
-
-  .primary{
-    background:var(--accent);
-    color:white;
-    box-shadow:0 10px 24px rgba(229,9,20,.22);
-  }
-
-  .primary:hover{transform:translateY(-1px);filter:brightness(1.06)}
-
-  .secondary{
-    background:#24242a;
-    color:#d8d8dd;
-    border:1px solid #303038;
-  }
-
-  .stage{
-    display:grid;
-    place-items:center;
-    padding:38px;
-  }
-
-  .stage-inner{
-    width:min(72vh, 680px);
-  }
-
-  .preview-label{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:12px;
-  }
-
-  .preview-wrap{
-    position:relative;
-    width:100%;
-    aspect-ratio:1/1;
-    border-radius:26px;
-    overflow:hidden;
-    box-shadow:
-      0 35px 100px rgba(0,0,0,.5),
-      0 0 0 1px rgba(255,255,255,.06);
-  }
-
-  canvas{
-    width:100%;
-    height:100%;
-    display:block;
-    background:#101012;
-  }
-
-  .hint{
-    color:#686871;
-    text-align:center;
-    font-size:11px;
-    margin-top:14px;
-  }
-
-  @media (max-width:850px){
-    .app{grid-template-columns:1fr}
-    .sidebar{border-right:0;border-bottom:1px solid var(--border);padding-bottom:24px}
-    .stage{padding:28px 18px 40px}
-    .stage-inner{width:min(92vw,680px)}
-  }
-</style>
-</head>
-<body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="mark">N</div>
-      <div>
-        <h1>Profile Card Maker</h1>
-        <div class="sub">Netflix-ish, without the subscription.</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101013" />
+    <meta
+      name="description"
+      content="Create cinematic profile cards with custom photos, holographic finishes, and high-resolution exports. Private, free, and entirely in your browser."
+    />
+    <title>Profile Card Maker — Card Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="model.js" defer></script>
+    <script src="renderer.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Profile Card Maker home"
+        ><span class="mark">P</span
+        ><span>Profile Card Maker<small>CARD STUDIO</small></span></a
+      >
+      <div class="top-actions">
+        <span id="draftStatus" class="draft-status" role="status"
+          >Draft ready</span
+        ><button id="importProject" class="quiet">Open project</button
+        ><button id="saveProject" class="quiet">Save project</button>
       </div>
-    </div>
-
-    <label>Profile picture</label>
-    <div class="upload">
-      <input id="photo" type="file" accept="image/*">
-      <strong>Choose an image</strong>
-      <span>JPG, PNG, WEBP</span>
-    </div>
-
-    <label for="name">Name</label>
-    <input id="name" type="text" maxlength="28" value="" placeholder="Enter a name">
-
-    <label for="bio">Short description</label>
-    <div class="bio-row">
-      <textarea id="bio" maxlength="90" placeholder="Write something about yourself…"></textarea>
-      <button class="secondary" id="rollBio" type="button">🎲 Roll</button>
-    </div>
-
-    <div class="row">
-      <div>
-        <label for="style">Style</label>
-        <select id="style">
-          <option value="classic">Classic</option>
-          <option value="glow">Glow</option>
-          <option value="minimal">Minimal</option>
-        </select>
-      </div>
-      <div>
-        <label for="font">Text</label>
-        <select id="font">
-          <option value="bold">Bold</option>
-          <option value="clean">Clean</option>
-          <option value="wide">Wide</option>
-        </select>
-      </div>
-    </div>
-
-    <label>Accent</label>
-    <div class="colors" id="colors">
-      <button class="swatch active" data-color="#e50914" style="background:#e50914" aria-label="Netflix red"></button>
-      <button class="swatch" data-color="#7a5cff" style="background:#7a5cff" aria-label="Purple"></button>
-      <button class="swatch" data-color="#00a8ff" style="background:#00a8ff" aria-label="Blue"></button>
-      <button class="swatch" data-color="#00c896" style="background:#00c896" aria-label="Green"></button>
-      <button class="swatch" data-color="#f1b63b" style="background:#f1b63b" aria-label="Gold"></button>
-      <button class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button>
-    </div>
-
-    <div class="range-head">
-      <span>Photo zoom</span><span id="zoomText">100%</span>
-    </div>
-    <input id="zoom" type="range" min="100" max="220" value="100">
-
-    <div class="range-head">
-      <span>Photo left / right</span><span id="posXText">Center</span>
-    </div>
-    <input id="posX" type="range" min="-100" max="100" value="0">
-
-    <div class="range-head">
-      <span>Photo up / down</span><span id="posText">Center</span>
-    </div>
-    <input id="pos" type="range" min="-100" max="100" value="0">
-
-    <div class="buttons">
-      <button class="primary" id="save">Save / Share PNG</button>
-      <button class="secondary" id="reset">Reset</button>
-    </div>
-  </aside>
-
-  <main class="stage">
-    <div class="stage-inner">
-      <div class="preview-label">
-        <span>LIVE PREVIEW</span>
-        <span>1080 × 1080 PNG</span>
-      </div>
-      <div class="preview-wrap">
-        <canvas id="canvas" width="1080" height="1080"></canvas>
-      </div>
-      <div class="hint">Your image never leaves your browser.</div>
-    </div>
-  </main>
-</div>
-
-<script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
-const photoInput = document.getElementById('photo');
-const nameInput = document.getElementById('name');
-const bioInput = document.getElementById('bio');
-const rollBioButton = document.getElementById('rollBio');
-const styleInput = document.getElementById('style');
-const fontInput = document.getElementById('font');
-const zoomInput = document.getElementById('zoom');
-const posXInput = document.getElementById('posX');
-const posInput = document.getElementById('pos');
-const zoomText = document.getElementById('zoomText');
-const posXText = document.getElementById('posXText');
-const posText = document.getElementById('posText');
-
-let accent = '#e50914';
-let image = null;
-
-const funnyBios = [
-  'Main character energy, background character budget.',
-  'Professionally unavailable until further notice.',
-  'Powered by snacks and questionable decisions.',
-  'I came, I saw, I forgot why I came.',
-  'Currently accepting compliments and pizza.',
-  'Too glam to give a damn. Occasionally.',
-  'Probably late, definitely worth it.',
-  'Fluent in sarcasm and unnecessary side quests.',
-  'Low battery, high standards.',
-  'Do not disturb unless you have gossip.',
-  'An adult, technically.',
-  'Here for a good time and a suspiciously long nap.',
-  'Plot armor pending approval.',
-  'My hobbies include overthinking and opening tabs.',
-  'Certified expert in making simple things complicated.'
-];
-
-function roundedRectPath(x,y,w,h,r){
-  const rr = Math.min(r,w/2,h/2);
-  ctx.beginPath();
-  ctx.moveTo(x+rr,y);
-  ctx.arcTo(x+w,y,x+w,y+h,rr);
-  ctx.arcTo(x+w,y+h,x,y+h,rr);
-  ctx.arcTo(x,y+h,x,y,rr);
-  ctx.arcTo(x,y,x+w,y,rr);
-  ctx.closePath();
-}
-
-function drawCover(img, x, y, w, h, zoom=1, offsetX=0, offsetY=0){
-  const baseScale = Math.max(w/img.width, h/img.height);
-  const scale = baseScale * zoom;
-  const dw = img.width * scale;
-  const dh = img.height * scale;
-  const maxMoveX = Math.max(0, (dw-w)/2);
-  const maxMoveY = Math.max(0, (dh-h)/2);
-  const dx = x + (w-dw)/2 + (offsetX/100)*Math.max(maxMoveX, w*0.12);
-  const dy = y + (h-dh)/2 + (offsetY/100)*Math.max(maxMoveY, h*0.12);
-  ctx.drawImage(img, dx, dy, dw, dh);
-}
-
-function drawPlaceholder(x,y,size){
-  const g = ctx.createLinearGradient(x,y,x+size,y+size);
-  g.addColorStop(0, '#2b2b31');
-  g.addColorStop(1, '#111114');
-  ctx.fillStyle = g;
-  ctx.fillRect(x,y,size,size);
-
-  ctx.fillStyle = '#53535c';
-  ctx.beginPath();
-  ctx.arc(x+size/2, y+size*.38, size*.13, 0, Math.PI*2);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(x+size/2, y+size*.78, size*.25, Math.PI, 0);
-  ctx.lineTo(x+size*.75,y+size);
-  ctx.lineTo(x+size*.25,y+size);
-  ctx.closePath();
-  ctx.fill();
-}
-
-function fontString(size){
-  if(fontInput.value === 'clean') return `500 ${size}px Arial, sans-serif`;
-  if(fontInput.value === 'wide') return `700 ${size}px "Arial Black", Arial, sans-serif`;
-  return `800 ${size}px Arial, sans-serif`;
-}
-
-function fitText(text, maxWidth, startSize){
-  let size = startSize;
-  while(size > 34){
-    ctx.font = fontString(size);
-    if(ctx.measureText(text).width <= maxWidth) break;
-    size -= 2;
-  }
-  return size;
-}
-
-function render(){
-  const W=1080,H=1080;
-  ctx.clearRect(0,0,W,H);
-
-  // Background
-  const bg = ctx.createRadialGradient(800,180,20,540,540,900);
-  if(styleInput.value === 'glow'){
-    bg.addColorStop(0, accent+'55');
-    bg.addColorStop(.42, '#15151a');
-    bg.addColorStop(1, '#070709');
-  }else{
-    bg.addColorStop(0, '#1b1b20');
-    bg.addColorStop(1, '#09090b');
-  }
-  ctx.fillStyle=bg;
-  ctx.fillRect(0,0,W,H);
-
-  // subtle top shine
-  const shine = ctx.createLinearGradient(0,0,0,H);
-  shine.addColorStop(0,'rgba(255,255,255,.035)');
-  shine.addColorStop(.32,'rgba(255,255,255,0)');
-  ctx.fillStyle=shine;
-  ctx.fillRect(0,0,W,H);
-
-  const minimal = styleInput.value === 'minimal';
-  const size = minimal ? 565 : 590;
-  const x = (W-size)/2;
-  const y = minimal ? 92 : 78;
-  const cx = x + size/2;
-  const cy = y + size/2;
-
-  if(styleInput.value === 'glow'){
-    ctx.save();
-    ctx.shadowColor=accent;
-    ctx.shadowBlur=62;
-    ctx.globalAlpha=.5;
-    ctx.fillStyle=accent;
-    ctx.beginPath();
-    ctx.arc(cx,cy,size/2+7,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  if(!minimal){
-    ctx.fillStyle=accent;
-    ctx.beginPath();
-    ctx.arc(cx,cy,size/2+10,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  // circular photo clip
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx,cy,size/2,0,Math.PI*2);
-  ctx.clip();
-  if(image){
-    drawCover(
-      image,x,y,size,size,
-      Number(zoomInput.value)/100,
-      Number(posXInput.value),
-      Number(posInput.value)
-    );
-  }else{
-    drawPlaceholder(x,y,size);
-  }
-
-  // bottom photo shade
-  const shade = ctx.createLinearGradient(0,y+size*.5,0,y+size);
-  shade.addColorStop(0,'rgba(0,0,0,0)');
-  shade.addColorStop(1,'rgba(0,0,0,.18)');
-  ctx.fillStyle=shade;
-  ctx.fillRect(x,y,size,size);
-  ctx.restore();
-
-  // name
-  const name = (nameInput.value || 'Your Name').trim();
-  const maxTextWidth = 840;
-  const textSize = fitText(name,maxTextWidth,76);
-  const nameY = 755;
-  ctx.font = fontString(textSize);
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillStyle='#f5f5f7';
-  ctx.shadowColor='rgba(0,0,0,.55)';
-  ctx.shadowBlur=18;
-  ctx.fillText(name,W/2,nameY);
-  ctx.shadowBlur=0;
-
-  if(styleInput.value !== 'minimal'){
-    const lineW=Math.min(150, Math.max(72, ctx.measureText(name).width*.16));
-    ctx.fillStyle=accent;
-    roundedRectPath(W/2-lineW/2,815,lineW,7,4);
-    ctx.fill();
-  }
-
-  const bio = (bioInput.value || 'Add a short description or roll for one.').trim();
-  ctx.font = '500 34px Arial, sans-serif';
-  ctx.fillStyle='#b8b8c0';
-  ctx.textAlign='center';
-  ctx.textBaseline='top';
-  const maxBioWidth = 790;
-  const words = bio.split(/\s+/);
-  const lines = [];
-  let line = '';
-  for(const word of words){
-    const test = line ? line + ' ' + word : word;
-    if(ctx.measureText(test).width > maxBioWidth && line){
-      lines.push(line);
-      line = word;
-    }else{
-      line = test;
-    }
-  }
-  if(line) lines.push(line);
-  const shown = lines.slice(0,2);
-  shown.forEach((text,i)=>ctx.fillText(text,W/2,858+i*45));
-
-  // ultra subtle grain-ish dots
-  ctx.globalAlpha=.045;
-  ctx.fillStyle='#fff';
-  for(let i=0;i<160;i++){
-    const px=(i*137)%W;
-    const py=(i*257)%H;
-    ctx.fillRect(px,py,1.5,1.5);
-  }
-  ctx.globalAlpha=1;
-}
-
-photoInput.addEventListener('change', e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      image=img;
-      zoomInput.value=100;
-      posXInput.value=0;
-      posInput.value=0;
-      zoomText.textContent='100%';
-      posXText.textContent='Center';
-      posText.textContent='Center';
-      render();
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-[nameInput,bioInput,styleInput,fontInput].forEach(el=>el.addEventListener('input',render));
-
-rollBioButton.addEventListener('click',()=>{
-  let next = funnyBios[Math.floor(Math.random()*funnyBios.length)];
-  if(funnyBios.length > 1 && next === bioInput.value){
-    next = funnyBios[(funnyBios.indexOf(next)+1)%funnyBios.length];
-  }
-  bioInput.value = next;
-  render();
-});
-
-zoomInput.addEventListener('input',()=>{
-  zoomText.textContent=zoomInput.value+'%';
-  render();
-});
-
-posXInput.addEventListener('input',()=>{
-  const v=Number(posXInput.value);
-  posXText.textContent = v===0 ? 'Center' : (v<0 ? 'Left '+Math.abs(v) : 'Right '+v);
-  render();
-});
-
-posInput.addEventListener('input',()=>{
-  const v=Number(posInput.value);
-  posText.textContent = v===0 ? 'Center' : (v<0 ? 'Up '+Math.abs(v) : 'Down '+v);
-  render();
-});
-
-document.querySelectorAll('.swatch').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.swatch').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    accent=btn.dataset.color;
-    document.documentElement.style.setProperty('--accent',accent);
-    render();
-  });
-});
-
-document.getElementById('save').addEventListener('click', async ()=>{
-  render();
-  const safeName=(nameInput.value || 'profile').trim().replace(/[^\p{L}\p{N}_-]+/gu,'-').replace(/^-+|-+$/g,'') || 'profile';
-  const filename=safeName+'-profile.png';
-
-  canvas.toBlob(async (blob)=>{
-    if(!blob) return;
-    const file=new File([blob], filename, {type:'image/png'});
-
-    // Best experience on iPhone/iPad: native share sheet -> Save Image / Save to Files.
-    if(navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
-      try{
-        await navigator.share({files:[file], title: filename});
-        return;
-      }catch(err){
-        if(err && err.name === 'AbortError') return;
-      }
-    }
-
-    // Desktop and browsers supporting the download attribute.
-    const url=URL.createObjectURL(blob);
-    const link=document.createElement('a');
-    link.href=url;
-    link.download=filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    // Keep URL alive briefly so Safari has time to consume it.
-    setTimeout(()=>URL.revokeObjectURL(url), 15000);
-  }, 'image/png');
-});
-
-document.getElementById('reset').addEventListener('click',()=>{
-  image=null;
-  photoInput.value='';
-  nameInput.value='';
-  bioInput.value='';
-  styleInput.value='classic';
-  fontInput.value='bold';
-  zoomInput.value=100;
-  posXInput.value=0;
-  posInput.value=0;
-  zoomText.textContent='100%';
-  posXText.textContent='Center';
-  posText.textContent='Center';
-  accent='#e50914';
-  document.documentElement.style.setProperty('--accent',accent);
-  document.querySelectorAll('.swatch').forEach(b=>b.classList.toggle('active',b.dataset.color===accent));
-  render();
-});
-
-render();
-</script>
-</body>
+    </header>
+    <main class="workspace">
+      <aside class="editor" aria-label="Card editor">
+        <div class="editor-heading">
+          <h1>Make it yours.</h1>
+          <span class="edition">STUDIO / 02</span>
+        </div>
+        <details open>
+          <summary><span class="section-number">01</span> Identity</summary>
+          <div class="section-body">
+            <label class="upload" id="dropzone" for="photo"
+              ><span class="upload-icon" aria-hidden="true">+</span
+              ><strong id="uploadLabel">Drop a photo or browse</strong
+              ><span>JPG, PNG, WEBP · up to 15 MB</span
+              ><input
+                id="photo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+            /></label>
+            <div class="photo-actions">
+              <button id="removePhoto" class="text-button" disabled>
+                Remove photo</button
+              ><span>Or paste an image</span>
+            </div>
+            <label for="name">Name</label
+            ><input
+              id="name"
+              type="text"
+              maxlength="40"
+              placeholder="Your Name"
+              autocomplete="off"
+            />
+            <label for="bio">Bio <span id="bioCount">0 / 140</span></label>
+            <div class="bio-row">
+              <textarea
+                id="bio"
+                maxlength="140"
+                placeholder="Main character energy."
+              ></textarea
+              ><button
+                id="rollBio"
+                class="quiet"
+                title="Roll a random bio"
+                aria-label="Roll a random bio"
+              >
+                ⚄
+              </button>
+            </div>
+            <div class="row">
+              <div>
+                <label for="handle">Handle</label
+                ><input
+                  id="handle"
+                  type="text"
+                  maxlength="32"
+                  placeholder="@yourhandle"
+                  autocomplete="off"
+                />
+              </div>
+              <div>
+                <label for="badge">Badge</label
+                ><input
+                  id="badge"
+                  type="text"
+                  maxlength="24"
+                  placeholder="MAIN CHARACTER"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+          </div>
+        </details>
+        <details open>
+          <summary>
+            <span class="section-number">02</span> Art direction
+          </summary>
+          <div class="section-body">
+            <div class="label-row">
+              <label>Choose a look</label
+              ><button id="shuffle" class="text-button">✦ Surprise me</button>
+            </div>
+            <div
+              id="presets"
+              class="presets"
+              role="group"
+              aria-label="Visual presets"
+            ></div>
+            <div class="row">
+              <div>
+                <label for="style">Finish</label
+                ><select id="style">
+                  <option value="classic">Classic</option>
+                  <option value="glow">Glow</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="holo">Holographic</option>
+                  <option value="synthwave">Synthwave</option>
+                  <option value="noir">Film noir</option>
+                </select>
+              </div>
+              <div>
+                <label for="font">Typography</label
+                ><select id="font">
+                  <option value="bold">Bold</option>
+                  <option value="clean">Clean</option>
+                  <option value="wide">Wide</option>
+                  <option value="mono">Monospace</option>
+                  <option value="serif">Editorial</option>
+                </select>
+              </div>
+            </div>
+            <label>Accent color</label>
+            <div
+              class="colors"
+              id="colors"
+              role="group"
+              aria-label="Accent color"
+            ></div>
+            <label class="check"
+              ><input id="texture" type="checkbox" /> Fine grain texture</label
+            >
+          </div>
+        </details>
+        <details>
+          <summary><span class="section-number">03</span> Photo lab</summary>
+          <div class="section-body">
+            <div class="row">
+              <div>
+                <label for="shape">Photo shape</label
+                ><select id="shape">
+                  <option value="circle">Circle</option>
+                  <option value="rounded">Rounded square</option>
+                  <option value="hexagon">Hexagon</option>
+                </select>
+              </div>
+              <div>
+                <label for="filter">Color grade</label
+                ><select id="filter">
+                  <option value="original">Original</option>
+                  <option value="mono">Black & white</option>
+                  <option value="warm">Golden hour</option>
+                  <option value="cool">Arctic</option>
+                  <option value="vivid">Vivid</option>
+                </select>
+              </div>
+            </div>
+            <label for="zoom">Zoom <output id="zoomText">100%</output></label
+            ><input id="zoom" type="range" min="100" max="300" value="100" />
+            <label for="posX"
+              >Left / right <output id="posXText">Center</output></label
+            ><input id="posX" type="range" min="-100" max="100" value="0" />
+            <label for="pos"
+              >Up / down <output id="posText">Center</output></label
+            ><input id="pos" type="range" min="-100" max="100" value="0" />
+            <label for="brightness"
+              >Brightness <output id="brightnessText">100%</output></label
+            ><input
+              id="brightness"
+              type="range"
+              min="50"
+              max="150"
+              value="100"
+            />
+            <button id="centerPhoto" class="quiet full">
+              Reset photo adjustments
+            </button>
+          </div>
+        </details>
+        <button id="reset" class="text-button reset">Start fresh</button>
+      </aside>
+      <section class="stage" aria-label="Live preview and export">
+        <div class="stage-toolbar">
+          <div
+            class="segmented"
+            id="formats"
+            role="group"
+            aria-label="Card format"
+          >
+            <button data-format="square" aria-pressed="true">Square</button
+            ><button data-format="portrait" aria-pressed="false">
+              Portrait</button
+            ><button data-format="story" aria-pressed="false">Story</button
+            ><button data-format="banner" aria-pressed="false">Banner</button>
+          </div>
+          <div class="history">
+            <button
+              id="undo"
+              class="quiet"
+              title="Undo (Ctrl/⌘ Z)"
+              aria-label="Undo"
+              disabled
+            >
+              ↶</button
+            ><button
+              id="redo"
+              class="quiet"
+              title="Redo (Ctrl/⌘ Shift Z)"
+              aria-label="Redo"
+              disabled
+            >
+              ↷
+            </button>
+          </div>
+        </div>
+        <div class="preview-space">
+          <div id="previewWrap" class="preview-wrap">
+            <canvas
+              id="canvas"
+              width="1080"
+              height="1080"
+              role="img"
+              aria-label="Live profile card preview"
+            ></canvas>
+          </div>
+        </div>
+        <div class="preview-meta">
+          <span id="dimensions">1080 × 1080</span
+          ><span>Drag the photo to reframe</span
+          ><label class="check tilt-toggle"
+            ><input id="tilt" type="checkbox" /> 3D preview</label
+          >
+        </div>
+        <div class="export-bar">
+          <div>
+            <label for="quality">PNG resolution</label
+            ><select id="quality">
+              <option value="1">Standard · 1×</option>
+              <option value="2">Ultra · 2×</option>
+            </select>
+          </div>
+          <button id="copyImage" class="quiet">Copy image</button
+          ><button id="save" class="primary">
+            Save / Share PNG <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <p class="privacy">
+          Made here. Stays here. Photos and drafts stay in this browser.
+        </p>
+      </section>
+    </main>
+    <input
+      id="projectFile"
+      type="file"
+      accept="application/json,.json"
+      hidden
+    />
+    <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+  </body>
 </html>
